@@ -1,0 +1,31 @@
+version: '3'
+services:
+  postgresql-master:
+    build: ./services/postgresql
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER-hardly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD-hardly}
+      MODE: master
+    volumes:
+      - data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRESQL_MASTER_PORT-5432}:5432"
+
+  postgresql-slave:
+    build: ./services/postgresql
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER-hardly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD-hardly}
+      MODE: slave
+      REPLICATE_FROM: postgresql-master
+    volumes:
+      - /var/lib/postgresql/data
+    links:
+      - postgresql-master
+
+# Persistant volumes
+volumes:
+  data:
+
